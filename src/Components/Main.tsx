@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import Sorting from "./Sorting";
 import { arrCategory } from "../constants/category";
 import type { IExpense } from "../type/expense";
+import Filter from "./Filter";
 
 type TMainProps = {
   expenses: IExpense[];
@@ -9,11 +10,16 @@ type TMainProps = {
 };
 
 function parseDate(dateString: string) {
-  const [day, month, year] = dateString.split(".").map(Number);
-  return new Date(year, month - 1, day).getTime();
+  // Пример простого парсинга для даты в формате 'YYYY-MM-DD'
+  const parts = dateString.split("-");
+  return new Date(
+    Number(parts[0]),
+    Number(parts[1]) - 1,
+    Number(parts[2])
+  ).getTime(); // вернем время в миллисекундах
 }
 
-export default function Main({ expenses, setExpenses }: TMainProps) {
+const Main = memo(({ expenses, setExpenses }: TMainProps) => {
   const [sortDate, setSortDate] = useState("date-desc");
   const [sortSum, setSortSum] = useState("sum-desc");
   const [filterCategory, setFilterCategory] = useState("Все категории");
@@ -21,24 +27,28 @@ export default function Main({ expenses, setExpenses }: TMainProps) {
   const deleteExpense = (id: number) => {
     setExpenses([...expenses].filter((expense) => expense.id !== id));
   };
-  console.log(...expenses);
 
-  const filters =
-    filterCategory === "Все категории"
+  const filters = useMemo(() => {
+    return filterCategory === "Все категории"
       ? expenses
       : expenses.filter((elem) => elem.category === filterCategory);
+  }, [expenses, filterCategory]);
 
-  const sortedExpenses = [...filters].sort((a, b) => {
-    if (sortSum === "sum-asc") return a.sum - b.sum;
-    if (sortSum === "sum-desc") return b.sum - a.sum;
+  const sortedExpenses = useMemo(() => {
+    return [...filters].sort((a, b) => {
+      if (sortSum === "sum-asc") return a.sum - b.sum;
+      if (sortSum === "sum-desc") return b.sum - a.sum;
 
-    const dateA = parseDate(a.date);
-    const dateB = parseDate(b.date);
+      const dateA = parseDate(a.date);
+      const dateB = parseDate(b.date);
 
-    return sortDate === "date-asc" ? dateA - dateB : dateB - dateA;
-  });
+      return sortDate === "date-asc" ? dateA - dateB : dateB - dateA;
+    });
+  }, [filters, sortSum, sortDate]);
 
-  const totalSum = filters.reduce((a, b) => a + b.sum, 0);
+  const totalSum = useMemo(() => {
+    return filters.reduce((a, b) => a + b.sum, 0);
+  }, [filters]);
 
   return (
     <div>
@@ -46,14 +56,13 @@ export default function Main({ expenses, setExpenses }: TMainProps) {
         <div className="head-section">
           <h2>Список затрат</h2>
           <div>
-            <Sorting
-              setSort={setSortSum}
-              sortDate={setSortDate}
-              arrCategory={arrCategory}
-              setFilterCategory={setFilterCategory}
-              filterCategory={filterCategory}
-            />
+            <Sorting setSort={setSortSum} sortDate={setSortDate} />
           </div>
+          <Filter
+            arrCategory={arrCategory}
+            setFilterCategory={setFilterCategory}
+            filterCategory={filterCategory}
+          />
         </div>
         <table>
           <thead>
@@ -88,4 +97,6 @@ export default function Main({ expenses, setExpenses }: TMainProps) {
       </div>
     </div>
   );
-}
+});
+
+export default Main;

@@ -6,7 +6,7 @@ type Props = {
   addExpense: (expense: Omit<IExpense, "id">) => void;
 };
 
-export default function Header({ addExpense }: Props) {
+const Header: React.FC<Props> = ({ addExpense }) => {
   const [description, setDescription] = useState("");
   const [sum, setSum] = useState(0);
   const [category, setCategory] = useState("");
@@ -16,6 +16,7 @@ export default function Header({ addExpense }: Props) {
   const [categoryError, setCategoryError] = useState(false);
   const [dateError, setDateError] = useState(false);
 
+  /* обработка клика **/
   function handleClickButton() {
     console.log("click", description, sum, category, date);
     if (description === "") {
@@ -129,4 +130,5 @@ export default function Header({ addExpense }: Props) {
       </div>
     </div>
   );
-}
+};
+export default Header;

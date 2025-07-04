@@ -5,7 +5,7 @@ import type { IExpense } from "./type/expense";
 
 const LOCAL_STORAGE_KEY = "expenses";
 
-function App() {
+const App = () => {
   const [expenses, setExpenses] = useState<IExpense[]>([]);
   console.log(expenses);
 
@@ -29,6 +29,6 @@ function App() {
       <Main expenses={expenses} setExpenses={setExpenses} />
     </>
   );
-}
+};
 
 export default App;

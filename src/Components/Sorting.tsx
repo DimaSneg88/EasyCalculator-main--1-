@@ -1,18 +1,11 @@
+import { memo } from "react";
+
 type Props = {
   setSort: (value: string) => void;
   sortDate: (value: string) => void;
-  arrCategory: string[];
-  setFilterCategory: (value: string) => void;
-  filterCategory: string;
 };
 
-export default function Sorting({
-  setSort,
-  sortDate,
-  arrCategory,
-  setFilterCategory,
-  filterCategory,
-}: Props) {
+const Sorting = memo(({ setSort, sortDate }: Props) => {
   return (
     <div className="sort-section">
       <div className="sort-controls">
@@ -32,23 +25,7 @@ export default function Sorting({
           <option value="name">По названию</option>
         </select>
       </div>
-      <div className="sort-controls">
-        Фильтр по категории:
-        <select
-          className="filter-select"
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
-        >
-          {arrCategory.map((el, index) => {
-            console.log(el);
-            return (
-              <option key={index} value={el}>
-                {el}
-              </option>
-            );
-          })}
-        </select>
-      </div>
     </div>
   );
-}
+});
+export default Sorting;
